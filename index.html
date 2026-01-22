@@ -232,67 +232,109 @@
                 } catch (e) { alert("Error"); }
             };
 
-            const downloadInvoice = (sale) => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 450;
-                canvas.height = 600 + (sale.items.length * 30);
-                const ctx = canvas.getContext('2d');
-                
-                const itemsHtml = sale.items.map(i => `
-                    <div style="display: flex; justify-content: space-between; font-size: 13px; border-bottom: 1px dashed #e2e8f0; padding: 8px 0;">
-                        <span style="flex: 1;">${i.cantidad}x ${i.productoNombre}</span>
-                        <span style="font-weight: bold; width: 80px; text-align: right;">$${(i.precio * i.cantidad).toLocaleString()}</span>
-                    </div>
-                `).join('');
+const downloadInvoice = (sale) => {
+    const canvas = document.createElement('canvas');
+    const height = 600 + (sale.items.length * 30);
+    canvas.width = 450;
+    canvas.height = height;
 
-                const svgString = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="450" height="${canvas.height}">
-                        <foreignObject width="100%" height="100%">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Inter', sans-serif; background: white; padding: 40px; height: 100%;">
-                                <div style="text-align: center; margin-bottom: 20px;">
-                                    <h2 style="color: #4f46e5; margin: 0; font-size: 24px;">RECIBO DE VENTA</h2>
-                                    <p style="color: #64748b; font-size: 11px;">FECHA: ${new Date(sale.fecha).toLocaleString()}</p>
-                                </div>
-                                <div style="margin-bottom: 20px;">
-                                    <p style="font-size: 10px; color: #94a3b8; font-weight: bold; margin: 0;">CLIENTE:</p>
-                                    <p style="font-weight: 800; font-size: 18px; margin: 0; color: #1e293b; text-transform: uppercase;">${sale.cliente}</p>
-                                </div>
-                                <div style="margin-bottom: 20px;">
-                                    <p style="font-size: 10px; color: #94a3b8; font-weight: bold; margin-bottom: 10px;">DETALLE DE PRODUCTOS:</p>
-                                    ${itemsHtml}
-                                </div>
-                                <div style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-top: 20px;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                        <span style="color: #64748b; font-size: 14px;">TOTAL:</span>
-                                        <span style="font-weight: 900; font-size: 22px; color: #1e293b;">$${sale.total.toLocaleString()}</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #10b981;">
-                                        <span style="font-size: 14px;">ABONADO:</span>
-                                        <span style="font-weight: bold;">$${sale.abono.toLocaleString()}</span>
-                                    </div>
-                                    <div style="display: flex; justify-content: space-between; color: #ef4444; border-top: 1px solid #e2e8f0; padding-top: 10px;">
-                                        <span style="font-size: 14px; font-weight: bold;">PENDIENTE:</span>
-                                        <span style="font-weight: 900; font-size: 18px;">$${(sale.total - sale.abono).toLocaleString()}</span>
-                                    </div>
-                                </div>
-                                <p style="text-align: center; color: #94a3b8; font-size: 10px; margin-top: 40px;">¡Gracias por su preferencia!</p>
-                            </div>
-                        </foreignObject>
-                    </svg>`;
+    const ctx = canvas.getContext('2d');
 
-                const img = new Image();
-                const svg = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-                const url = URL.createObjectURL(svg);
-                img.onload = () => {
-                    ctx.fillStyle = "white"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0);
-                    const link = document.createElement("a");
-                    link.download = `Factura-${sale.cliente}.png`;
-                    link.href = canvas.toDataURL("image/png");
-                    link.click();
-                };
-                img.src = url;
-            };
+    // Fondo
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Encabezado
+    ctx.fillStyle = "#4f46e5";
+    ctx.font = "bold 22px Inter, Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("RECIBO DE VENTA", canvas.width / 2, 40);
+
+    ctx.fillStyle = "#64748b";
+    ctx.font = "10px Arial";
+    ctx.fillText(new Date(sale.fecha).toLocaleString(), canvas.width / 2, 60);
+
+    // Cliente
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "bold 10px Arial";
+    ctx.fillText("CLIENTE:", 40, 100);
+
+    ctx.fillStyle = "#1e293b";
+    ctx.font = "bold 18px Arial";
+    ctx.fillText(sale.cliente.toUpperCase(), 40, 125);
+
+    // Productos
+    let y = 165;
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "bold 10px Arial";
+    ctx.fillText("DETALLE DE PRODUCTOS:", 40, y);
+    y += 20;
+
+    ctx.font = "13px Arial";
+    ctx.fillStyle = "#1e293b";
+
+    sale.items.forEach(item => {
+        ctx.fillText(`${item.cantidad}x ${item.productoNombre}`, 40, y);
+        ctx.textAlign = "right";
+        ctx.font = "bold 13px Arial";
+        ctx.fillText(
+            `$${(item.precio * item.cantidad).toLocaleString()}`,
+            canvas.width - 40,
+            y
+        );
+        ctx.textAlign = "left";
+        ctx.font = "13px Arial";
+        y += 25;
+    });
+
+    // Totales
+    y += 20;
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.beginPath();
+    ctx.moveTo(40, y);
+    ctx.lineTo(canvas.width - 40, y);
+    ctx.stroke();
+
+    y += 30;
+    ctx.font = "14px Arial";
+    ctx.fillStyle = "#64748b";
+    ctx.fillText("TOTAL:", 40, y);
+    ctx.font = "bold 22px Arial";
+    ctx.fillStyle = "#1e293b";
+    ctx.textAlign = "right";
+    ctx.fillText(`$${sale.total.toLocaleString()}`, canvas.width - 40, y);
+
+    y += 30;
+    ctx.font = "14px Arial";
+    ctx.fillStyle = "#10b981";
+    ctx.textAlign = "left";
+    ctx.fillText("ABONADO:", 40, y);
+    ctx.textAlign = "right";
+    ctx.font = "bold 14px Arial";
+    ctx.fillText(`$${sale.abono.toLocaleString()}`, canvas.width - 40, y);
+
+    y += 25;
+    ctx.fillStyle = "#ef4444";
+    ctx.textAlign = "left";
+    ctx.font = "bold 14px Arial";
+    ctx.fillText("PENDIENTE:", 40, y);
+    ctx.textAlign = "right";
+    ctx.font = "bold 18px Arial";
+    ctx.fillText(
+        `$${(sale.total - sale.abono).toLocaleString()}`,
+        canvas.width - 40,
+        y
+    );
+
+    // Descargar
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = `Factura-${sale.cliente}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
 
             const registrarAbonoDeuda = async (deudor) => {
                 const monto = prompt(`Abono para ${deudor.cliente}.\nSaldo: $${deudor.totalDeuda.toLocaleString()}\n¿Monto?`);
@@ -596,3 +638,4 @@
     </script>
 </body>
 </html>
+
