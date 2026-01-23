@@ -337,6 +337,43 @@ const downloadInvoice = (sale) => {
         ctx.fillStyle = "#64748b";
         ctx.font = "10px Arial";
         ctx.fillText(new Date(sale.fecha).toLocaleString(), 225, 155);
+const downloadInvoice = (sale) => {
+    const canvas = document.createElement('canvas');
+    const scale = 2;
+    const height = 600 + (sale.items.length * 30);
+
+    canvas.width = 450 * scale;
+    canvas.height = height * scale;
+
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+
+    // Fondo
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, 450, height);
+
+    // 👉 LOGO
+    const logo = new Image();
+    logo.crossOrigin = "anonymous"; // MUY IMPORTANTE
+    logo.src = "https://tusitio.com/logo.png"; // ⬅️ TU LOGO AQUÍ
+
+    logo.onload = () => {
+
+        // Dibujar logo (centrado)
+        const logoWidth = 90;
+        const logoHeight = 90;
+        ctx.drawImage(logo, (450 - logoWidth) / 2, 20, logoWidth, logoHeight);
+
+        // Título
+        ctx.fillStyle = "#4f46e5";
+        ctx.font = "bold 22px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("RECIBO DE VENTA", 225, 135);
+
+        // Fecha
+        ctx.fillStyle = "#64748b";
+        ctx.font = "10px Arial";
+        ctx.fillText(new Date(sale.fecha).toLocaleString(), 225, 155);
 
         // Cliente
         ctx.textAlign = "left";
@@ -715,5 +752,6 @@ const downloadInvoice = (sale) => {
     </script>
 </body>
 </html>
+
 
 
