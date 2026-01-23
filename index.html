@@ -300,154 +300,40 @@ const downloadInvoice = (sale) => {
     ctx.font = "14px Arial";
     ctx.fillStyle = "#64748b";
     ctx.fillText("TOTAL:", 40, y);
-const downloadInvoice = (sale) => {
-    const canvas = document.createElement('canvas');
-    const scale = 2;
-    const height = 600 + (sale.items.length * 30);
+    ctx.font = "bold 22px Arial";
+    ctx.fillStyle = "#1e293b";
+    ctx.textAlign = "right";
+    ctx.fillText(`$${sale.total.toLocaleString()}`, canvas.width - 40, y);
 
-    canvas.width = 450 * scale;
-    canvas.height = height * scale;
+    y += 30;
+    ctx.font = "14px Arial";
+    ctx.fillStyle = "#10b981";
+    ctx.textAlign = "left";
+    ctx.fillText("ABONADO:", 40, y);
+    ctx.textAlign = "right";
+    ctx.font = "bold 14px Arial";
+    ctx.fillText(`$${sale.abono.toLocaleString()}`, canvas.width - 40, y);
 
-    const ctx = canvas.getContext('2d');
-    ctx.scale(scale, scale);
+    y += 25;
+    ctx.fillStyle = "#ef4444";
+    ctx.textAlign = "left";
+    ctx.font = "bold 14px Arial";
+    ctx.fillText("PENDIENTE:", 40, y);
+    ctx.textAlign = "right";
+    ctx.font = "bold 18px Arial";
+    ctx.fillText(
+        `$${(sale.total - sale.abono).toLocaleString()}`,
+        canvas.width - 40,
+        y
+    );
 
-    // Fondo
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, 450, height);
-
-    // 👉 LOGO
-    const logo = new Image();
-    logo.crossOrigin = "anonymous"; // Muy importante para evitar problemas de CORS
-    logo.src = "https://i.ibb.co/4w6k1SKD/ESTOREPNG.png"; // Tu logo desde Imgbb
-
-    logo.onload = () => {
-
-        // Dibujar logo (centrado)
-        const logoWidth = 90;
-        const logoHeight = 90;
-        ctx.drawImage(logo, (450 - logoWidth) / 2, 20, logoWidth, logoHeight);
-
-        // Título
-        ctx.fillStyle = "#4f46e5";
-        ctx.font = "bold 22px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("RECIBO DE VENTA", 225, 135);
-
-        // Fecha
-        ctx.fillStyle = "#64748b";
-        ctx.font = "10px Arial";
-        ctx.fillText(new Date(sale.fecha).toLocaleString(), 225, 155);
-const downloadInvoice = (sale) => {
-    const canvas = document.createElement('canvas');
-    const scale = 2;
-    const height = 600 + (sale.items.length * 30);
-
-    canvas.width = 450 * scale;
-    canvas.height = height * scale;
-
-    const ctx = canvas.getContext('2d');
-    ctx.scale(scale, scale);
-
-    // Fondo
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, 450, height);
-
-    // 👉 LOGO
-    const logo = new Image();
-    logo.crossOrigin = "anonymous"; // MUY IMPORTANTE
-    logo.src = "https://tusitio.com/logo.png"; // ⬅️ TU LOGO AQUÍ
-
-    logo.onload = () => {
-
-        // Dibujar logo (centrado)
-        const logoWidth = 90;
-        const logoHeight = 90;
-        ctx.drawImage(logo, (450 - logoWidth) / 2, 20, logoWidth, logoHeight);
-
-        // Título
-        ctx.fillStyle = "#4f46e5";
-        ctx.font = "bold 22px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("RECIBO DE VENTA", 225, 135);
-
-        // Fecha
-        ctx.fillStyle = "#64748b";
-        ctx.font = "10px Arial";
-        ctx.fillText(new Date(sale.fecha).toLocaleString(), 225, 155);
-
-        // Cliente
-        ctx.textAlign = "left";
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "bold 10px Arial";
-        ctx.fillText("CLIENTE:", 40, 195);
-
-        ctx.fillStyle = "#1e293b";
-        ctx.font = "bold 18px Arial";
-        ctx.fillText(sale.cliente.toUpperCase(), 40, 220);
-
-        // Productos
-        let y = 260;
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "bold 10px Arial";
-        ctx.fillText("DETALLE DE PRODUCTOS:", 40, y);
-        y += 20;
-
-        ctx.font = "13px Arial";
-        ctx.fillStyle = "#1e293b";
-
-        sale.items.forEach(item => {
-            ctx.fillText(`${item.cantidad}x ${item.productoNombre}`, 40, y);
-            ctx.textAlign = "right";
-            ctx.font = "bold 13px Arial";
-            ctx.fillText(`$${(item.precio * item.cantidad).toLocaleString()}`, 410, y);
-            ctx.textAlign = "left";
-            ctx.font = "13px Arial";
-            y += 25;
-        });
-
-        // Totales
-        y += 20;
-        ctx.strokeStyle = "#e5e7eb";
-        ctx.beginPath();
-        ctx.moveTo(40, y);
-        ctx.lineTo(410, y);
-        ctx.stroke();
-
-        y += 30;
-        ctx.font = "14px Arial";
-        ctx.fillStyle = "#64748b";
-        ctx.fillText("TOTAL:", 40, y);
-        ctx.font = "bold 22px Arial";
-        ctx.fillStyle = "#1e293b";
-        ctx.textAlign = "right";
-        ctx.fillText(`$${sale.total.toLocaleString()}`, 410, y);
-
-        y += 30;
-        ctx.font = "14px Arial";
-        ctx.fillStyle = "#10b981";
-        ctx.textAlign = "left";
-        ctx.fillText("ABONADO:", 40, y);
-        ctx.textAlign = "right";
-        ctx.font = "bold 14px Arial";
-        ctx.fillText(`$${sale.abono.toLocaleString()}`, 410, y);
-
-        y += 25;
-        ctx.fillStyle = "#ef4444";
-        ctx.textAlign = "left";
-        ctx.font = "bold 14px Arial";
-        ctx.fillText("PENDIENTE:", 40, y);
-        ctx.textAlign = "right";
-        ctx.font = "bold 18px Arial";
-        ctx.fillText(`$${(sale.total - sale.abono).toLocaleString()}`, 410, y);
-
-        // Descargar
-        const link = document.createElement("a");
-        link.href = canvas.toDataURL("image/png");
-        link.download = `Factura-${sale.cliente}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
+    // Descargar
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = `Factura-${sale.cliente}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 };
 
             const registrarAbonoDeuda = async (deudor) => {
@@ -752,6 +638,3 @@ const downloadInvoice = (sale) => {
     </script>
 </body>
 </html>
-
-
-
